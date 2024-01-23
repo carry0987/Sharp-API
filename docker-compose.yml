@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  app:
+    image: carry0987/sharp-api:latest
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=production
+      - IMAGE_KEY=your_image_key
+      - IMAGE_SALT=your_image_salt
+      - SOURCE_URL_ENCRYPTION_KEY=your_source_url_encryption_key
+      - AUTO_DETECT_WEBP=false
+      - ALLOW_FROM_URL=false
+      - SAVE_IMAGE=true
+      - IMAGE_DEBUG=false
+    volumes:
+      - ./images:/app/images
+      - ./processed:/app/processed
