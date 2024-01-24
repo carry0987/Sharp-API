@@ -1,5 +1,5 @@
 import { ProcessedImage } from './interface/interfaces';
-import { ImageFormat } from './type/types';
+import { ImageFormat, ImageOption, SaveOptions } from './type/types';
 import { Response } from 'express';
 import { handleResponse } from './utils';
 import { config } from './config';
@@ -16,21 +16,30 @@ export function parseImageFormat(extension?: string): ImageFormat | undefined {
     return format;
 }
 
-export function parseProcessingOptions(processingOptions: string): { width?: number, height?: number } {
+export function parseProcessingOptions(processingOptions: string): ImageOption {
     let width: number | undefined;
     let height: number | undefined;
+    let suffix: string | undefined;
 
     processingOptions.split('/').forEach((option) => {
         const parts = option.split(':');
-        if (parts[0] === 'rs' && parts.length === 3) {
-            const parsedWidth = parseInt(parts[1], 10);
-            const parsedHeight = parseInt(parts[2], 10);
-            width = (!isNaN(parsedWidth) && parsedWidth !== 0) ? parsedWidth : undefined;
-            height = (!isNaN(parsedHeight) && parsedHeight !== 0) ? parsedHeight : undefined;
+        if (parts[0] === 'rs') {
+            if (parts.length === 3) {
+                const parsedWidth = parseInt(parts[1], 10);
+                const parsedHeight = parseInt(parts[2], 10);
+                width = (!isNaN(parsedWidth) && parsedWidth !== 0) ? parsedWidth : undefined;
+                height = (!isNaN(parsedHeight) && parsedHeight !== 0) ? parsedHeight : undefined;
+            } else if (parts.length === 4) {
+                const parsedWidth = parseInt(parts[1], 10);
+                const parsedHeight = parseInt(parts[2], 10);
+                suffix = parts[3];
+                width = (!isNaN(parsedWidth) && parsedWidth !== 0) ? parsedWidth : undefined;
+                height = (!isNaN(parsedHeight) && parsedHeight !== 0) ? parsedHeight : undefined;
+            }
         }
     });
 
-    return { width, height };
+    return { width, height, suffix };
 }
 
 export async function processImage(buffer: Buffer, width?: number, height?: number, format?: ImageFormat): Promise<ProcessedImage> {
@@ -83,12 +92,14 @@ export async function processImage(buffer: Buffer, width?: number, height?: numb
     };
 }
 
-export async function saveProcessedImage(sourcePath: string, processedBuffer: Buffer, format: ImageFormat, originalFormat: ImageFormat): Promise<void> {
+export async function saveProcessedImage(options: SaveOptions): Promise<void> {
     if (config.saveImage) {
+        const { sourcePath, processedBuffer, format, originalFormat, suffix } = options;
         const processedDir: string = config.processedDir;
         const relativeSourcePath: string = sourcePath.startsWith('/') ? sourcePath.substring(1) : sourcePath;
-        const extension = format === originalFormat ? '' : `.${format}`;
-        const savePath: string = join(processedDir, `${relativeSourcePath}${extension}`);
+        const extension = (format === originalFormat) ? '' : `.${format}`;
+        const suffixPart = suffix ? `${suffix}` : '';
+        const savePath: string = join(processedDir, `${relativeSourcePath}${suffixPart}${extension}`);
         const directory: string = dirname(savePath);
         try {
             await fsPromises.mkdir(directory, { recursive: true });

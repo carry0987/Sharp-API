@@ -19,8 +19,7 @@ const BASE_PATH: string = config.basePath;
 const IMAGE_DEBUG: boolean = config.imageDebug;
 
 app.get('/:signature/:processing_options/enc/:encrypted.:extension?', async (req: Request, res: Response) => {
-    const { signature, processing_options, encrypted } = req.params;
-    let { extension } = req.params;
+    const { signature, processing_options, encrypted, extension } = req.params;
     const signatureDecoded: Buffer = base64urlDecode(signature);
     const encPath: string = `/${processing_options}/enc/${encrypted}`;
     if (!verifySignature(encPath, signatureDecoded)) {
@@ -33,7 +32,7 @@ app.get('/:signature/:processing_options/enc/:encrypted.:extension?', async (req
     let imageFromLocal: boolean = true;
     try {
         let format = parseImageFormat(extension);
-        const { width, height } = parseProcessingOptions(processing_options);
+        const { width, height, suffix } = parseProcessingOptions(processing_options);
         if (ALLOW_FROM_URL && sourceURL.match(/^https?:\/\//)) {
             imageFromLocal = false;
             const response = await axios({
@@ -54,7 +53,13 @@ app.get('/:signature/:processing_options/enc/:encrypted.:extension?', async (req
         handleResponse(null, 200, `Processed and sent image for ${sourceURL}`);
         // Save the processed image
         if (imageFromLocal) {
-            await saveProcessedImage(sourceURL, processedImage.buffer, processedImage.format as ImageFormat, processedImage.originalFormat as ImageFormat);
+            await saveProcessedImage({
+                sourcePath: sourceURL,
+                processedBuffer: processedImage.buffer,
+                format: processedImage.format as ImageFormat,
+                originalFormat: processedImage.originalFormat as ImageFormat,
+                suffix: suffix
+            });
         }
     } catch (error) {
         const errorMsg = IMAGE_DEBUG ? `Error processing the image: ${(error as Error).stack}` : 'Unknown error occurred while processing the image';

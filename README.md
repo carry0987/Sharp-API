@@ -59,15 +59,18 @@ This Docker Compose configuration will start a container with the `carry0987/sha
 
 ## API Usage
 Make a GET request to the service with a signature, image processing options, and an encrypted image source URL:
-
 ```
 http://your-domain.com/<signature>/<processing_options>/enc/<encrypted_source_url>
 ```
 
-You can specify processing options, such as resizing, via the URL path as follows:
-
+You can specify processing options, such as **resizing**, via the URL path as follows:
 ```
-<processing_options> = /rs:300:300
+<processing_options> = rs:300:300
+```
+
+If you want to set **suffix** for the processed image, you can specify it as follows:
+```
+<processing_options> = rs:300:300:_s
 ```
 
 ## Contributing
