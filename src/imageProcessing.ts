@@ -98,7 +98,7 @@ export async function saveProcessedImage(options: SaveOptions): Promise<void> {
         const processedDir: string = config.processedDir;
         const relativeSourcePath: string = sourcePath.startsWith('/') ? sourcePath.substring(1) : sourcePath;
         const parsedPath = parse(relativeSourcePath);
-        const directory: string = dirname(join(processedDir, parsedPath.dir));
+        const directory: string = join(processedDir, parsedPath.dir);
         const baseName = parsedPath.name + (suffix ? `${suffix}` : '');
         const newExtension = format === originalFormat ? parsedPath.ext : `.${format}`;
         const savePath: string = join(directory, `${baseName}${newExtension}`);
