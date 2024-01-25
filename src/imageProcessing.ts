@@ -103,7 +103,7 @@ export async function saveProcessedImage(options: SaveOptions): Promise<void> {
         const newExtension = format === originalFormat ? parsedPath.ext : `.${format}`;
         const savePath: string = join(processedDir, directory, `${baseName}${newExtension}`);
         try {
-            await fsPromises.mkdir(directory, { recursive: true });
+            await fsPromises.mkdir(dirname(savePath), { recursive: true });
             await fsPromises.writeFile(savePath, processedBuffer);
             handleResponse(null, 200, `Image saved to ${savePath}`);
         } catch (error) {
