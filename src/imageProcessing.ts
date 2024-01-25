@@ -5,7 +5,7 @@ import { handleResponse } from './utils';
 import { config } from './config';
 import sharp from 'sharp';
 import { promises as fsPromises } from 'fs';
-import { join, dirname } from 'path';
+import { join, dirname, parse } from 'path';
 
 export function parseImageFormat(extension?: string): ImageFormat | undefined {
     if (!extension) {
@@ -97,9 +97,10 @@ export async function saveProcessedImage(options: SaveOptions): Promise<void> {
         const { sourcePath, processedBuffer, format, originalFormat, suffix } = options;
         const processedDir: string = config.processedDir;
         const relativeSourcePath: string = sourcePath.startsWith('/') ? sourcePath.substring(1) : sourcePath;
-        const extension = (format === originalFormat) ? '' : `.${format}`;
-        const suffixPart = suffix ? `${suffix}` : '';
-        const savePath: string = join(processedDir, `${relativeSourcePath}${suffixPart}${extension}`);
+        const { name, ext } = parse(relativeSourcePath);
+        const newName = suffix ? `${name}${suffix}${ext}` : relativeSourcePath;
+        const extension = ext && (format === originalFormat) ? '' : `.${format}`;
+        const savePath: string = join(processedDir, `${newName}${extension}`);
         const directory: string = dirname(savePath);
         try {
             await fsPromises.mkdir(directory, { recursive: true });
