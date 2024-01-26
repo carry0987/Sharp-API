@@ -14,6 +14,9 @@ const ALLOW_FROM_URL: boolean = config.allowFromUrl;
 const BASE_PATH: string = config.basePath;
 const IMAGE_DEBUG: boolean = config.imageDebug;
 
+// Remove default ETag header
+app.set('Etag', false);
+
 app.get('/:signature/:processing_options/enc/:encrypted.:extension?', async (req: Request, res: Response) => {
     const { signature, processing_options, encrypted, extension } = req.params;
     const signatureDecoded: Buffer = base64urlDecode(signature);
@@ -71,18 +74,18 @@ app.get('/:signature/:processing_options/enc/:encrypted.:extension?', async (req
             // If the image is already processed, send it directly
             if (imageExists) {
                 // Set the E-Tag header if checkETag is enabled
-                if (config.checkETag) {
+                if (config.checkETag && !res.getHeader('ETag')) {
                     const cacheImage: Buffer = await readFileAsync(savePathInfo.path);
-                    const eTag = generateETag(cacheImage);
-                    const ifNoneMatch = req.headers['if-none-match'];
-                    if (ifNoneMatch === eTag) {
+                    const eTag = generateETag(cacheImage, { width, height, suffix });
+                    const clientETag = req.headers['if-none-match'];
+                    if (clientETag && clientETag === eTag) {
                         handleResponse(res, 304, `Cached image for ${sourceURL} already sent`);
                         return;
                     }
-                    res.setHeader('E-Tag', eTag);
+                    res.setHeader('ETag', eTag);
                 }
                 res.type(`image/${format}`);
-                res.sendFile(savePathInfo.path);
+                res.sendFile(path.resolve(savePathInfo.path));
                 handleResponse(null, 200, `Sent cached image for ${sourceURL}`);
                 return;
             }
@@ -99,8 +102,8 @@ app.get('/:signature/:processing_options/enc/:encrypted.:extension?', async (req
         const processedImage = await processImage(imageBuffer, width, height, format);
         // Set the E-Tag header if checkETag is enabled
         if (config.checkETag) {
-            const eTag = generateETag(processedImage.buffer);
-            res.setHeader('E-Tag', eTag);
+            const eTag = generateETag(processedImage.buffer, { width, height, suffix });
+            res.setHeader('ETag', eTag);
         }
         res.type(`image/${processedImage.format}`);
         res.end(processedImage.buffer);

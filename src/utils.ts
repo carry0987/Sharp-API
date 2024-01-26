@@ -1,3 +1,4 @@
+import { ImageOption } from './type/types';
 import { config } from './config';
 import { Response } from 'express';
 import { promises as fsPromises } from 'fs';
@@ -14,8 +15,10 @@ export async function checkFileExists(filePath: string): Promise<boolean> {
     }
 }
 
-export function generateETag(buffer: Buffer) {
-    return crypto.createHash('md5').update(buffer).digest('hex');
+export function generateETag(buffer: Buffer, options: ImageOption): string {
+    const optionsString = JSON.stringify(options);
+
+    return crypto.createHash('md5').update(buffer).update(optionsString).digest('hex');
 }
 
 export function handleResponse(res: Response | null, statusCode: number, logMessage: string, clientMessage?: string, error?: Error) {

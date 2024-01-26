@@ -19,15 +19,31 @@ function getEnvBoolean(key: string, defaultValue: boolean): boolean {
     return value.toLowerCase() === 'true';
 }
 
+function getEnvNumber(key: string, defaultValue: number): number {
+    const value = process.env[key];
+    if (typeof value === 'undefined') {
+        return defaultValue;
+    }
+    return Number(value);
+}
+
+function getEnvString(key: string, defaultValue: string): string {
+    const value = process.env[key];
+    if (typeof value === 'undefined') {
+        return defaultValue;
+    }
+    return value;
+}
+
 export const config = {
-    port: 3000,
+    port: getEnvNumber('PORT', 3000),
     autoDetectWebp: getEnvBoolean('AUTO_DETECT_WEBP', false),
     sourceUrlEncryptionKey: getEnvBuffer('SOURCE_URL_ENCRYPTION_KEY'),
     imageKey: getEnvBuffer('IMAGE_KEY'),
     imageSalt: getEnvBuffer('IMAGE_SALT'),
     allowFromUrl: getEnvBoolean('ALLOW_FROM_URL', false),
-    basePath: '/app/images',
-    processedDir: '/app/processed',
+    basePath: getEnvString('BASE_PATH', '/app/images'),
+    processedDir: getEnvString('PROCESSED_DIR', '/app/processed'),
     saveImage: getEnvBoolean('SAVE_IMAGE', false),
     cache: getEnvBoolean('CACHE', false),
     checkETag: getEnvBoolean('CHECK_ETAG', false),
