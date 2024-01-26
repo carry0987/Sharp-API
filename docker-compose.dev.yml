@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     ports:
-      - 3000:3000
+      - 3001:3000
     environment:
       - NODE_ENV=development
       - IMAGE_KEY=691e523490bf50a5323572fff18c2dc0625c69dc449be7bc3ecf47840f17a85b
