@@ -5,10 +5,7 @@ import { getFormatFromExtension, parseImageFormat, parseProcessingOptions, proce
 import { gracefulShutdown } from './shutdown';
 import express, { Application, Request, Response } from 'express';
 import axios from 'axios';
-import dotenv from 'dotenv';
 import path from 'path';
-
-dotenv.config();
 
 const app: Application = express();
 const port: string | number = process.env.PORT || 3000;
