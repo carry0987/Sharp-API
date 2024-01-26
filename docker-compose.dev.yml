@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=development
+      - IMAGE_KEY=691e523490bf50a5323572fff18c2dc0625c69dc449be7bc3ecf47840f17a85b
+      - IMAGE_SALT=ca0d2b3a2b990217cb336ef159fac050f54216d6dacc53509254e23abb1a8b06
+      - SOURCE_URL_ENCRYPTION_KEY=fec568d6e3768619cac5d4ab00176da9e893c37f0583dfcbad3dd4919d14dcf4
+      - AUTO_DETECT_WEBP=false
+      - ALLOW_FROM_URL=true
+      - SAVE_IMAGE=true
+      - CACHE=true
+      - CHECK_ETAG=false
+      - IMAGE_DEBUG=true
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: tail -f /dev/null
