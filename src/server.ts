@@ -3,6 +3,7 @@ import { config } from './config';
 import { readFileAsync, checkFileExists, generateETag, handleResponse, base64urlDecode, verifySignature, decryptSourceURL } from './module/utils';
 import { getFormatFromExtension, parseImageFormat, parseProcessingOptions, processImage, getImageSavePath, saveProcessedImage, sendBlankImage } from './module/imageProcessing';
 import { gracefulShutdown } from './module/shutdown';
+import { setCache, validateCache } from './module/cache';
 import express, { Application, Request, Response } from 'express';
 import axios from 'axios';
 import path from 'path';
@@ -64,6 +65,9 @@ app.get('/:signature/:processing_options/enc/:encrypted.:extension?', async (req
         }
         // Check if the image is already processed
         if (config.cache && imageFromLocal) {
+            // Check if the image is already cached
+            const cachedPath = validateCache(sourceURL, { width, height, suffix });
+            // Get the save path for the processed image
             savePathInfo = await getImageSavePath({
                 sourcePath: sourceURL,
                 format: format!,
@@ -72,7 +76,7 @@ app.get('/:signature/:processing_options/enc/:encrypted.:extension?', async (req
             });
             const imageExists = await checkFileExists(savePathInfo.path);
             // If the image is already processed, send it directly
-            if (imageExists) {
+            if (imageExists && cachedPath) {
                 // Set the E-Tag header if checkETag is enabled
                 if (config.checkETag && !res.getHeader('ETag')) {
                     const cacheImage: Buffer = await readFileAsync(savePathInfo.path);
@@ -117,6 +121,8 @@ app.get('/:signature/:processing_options/enc/:encrypted.:extension?', async (req
                 suffix: suffix
             });
             await saveProcessedImage(processedImage.buffer, savePathInfo);
+            // Cache the processed image
+            setCache(sourceURL, { width, height, suffix });
         }
     } catch (error) {
         const errorMsg = IMAGE_DEBUG ? `Error processing the image: ${(error as Error).stack}` : 'Unknown error occurred while processing the image';
