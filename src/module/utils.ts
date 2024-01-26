@@ -4,6 +4,10 @@ import { Response } from 'express';
 import { promises as fsPromises } from 'fs';
 import * as crypto from 'crypto';
 
+function removeTrailingSlash(str: string): string {
+    return str.replace(/\/+$/, '');
+}
+
 export const readFileAsync = fsPromises.readFile;
 
 export async function checkFileExists(filePath: string): Promise<boolean> {
@@ -47,10 +51,13 @@ export function decryptSourceURL(encrypted: Buffer): string {
     const decipher = crypto.createDecipheriv('aes-256-cbc', config.sourceUrlEncryptionKey, iv);
     let decrypted = decipher.update(encryptedText);
     decrypted = Buffer.concat([decrypted, decipher.final()]);
+
     return decrypted.toString();
 }
 
 export function verifySignature(path: string, signature: Buffer): boolean {
+    path = removeTrailingSlash(path);
     const hash: Buffer = crypto.createHmac('sha256', config.imageKey).update(config.imageSalt).update(path).digest();
+
     return signature.equals(hash.subarray(0, signature.length));
 }

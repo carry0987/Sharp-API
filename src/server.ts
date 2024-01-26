@@ -1,7 +1,8 @@
 import { ImageFormat, ImageCache, SavePath } from './type/types';
 import { config } from './config';
 import { readFileAsync, checkFileExists, generateETag, handleResponse, base64urlDecode, verifySignature, decryptSourceURL } from './module/utils';
-import { getFormatFromExtension, parseImageFormat, parseProcessingOptions, processImage, getImageSavePath, saveProcessedImage, sendBlankImage } from './module/imageProcessing';
+import { parseFormatFromExtension, parseImageFormat, parseProcessingOptions } from './module/parser';
+import { processImage, getImageSavePath, saveProcessedImage, sendBlankImage } from './module/imageProcessing';
 import { gracefulShutdown } from './module/shutdown';
 import { setCache, validateCache } from './module/cache';
 import express, { Application, Request, Response } from 'express';
@@ -18,10 +19,10 @@ const IMAGE_DEBUG: boolean = config.imageDebug;
 // Remove default ETag header
 app.set('Etag', false);
 
-app.get('/:signature/:processing_options/enc/:encrypted.:extension?', async (req: Request, res: Response) => {
+app.get('/:signature/:processing_options/enc/:encrypted/:extension?', async (req: Request, res: Response) => {
     const { signature, processing_options, encrypted, extension } = req.params;
     const signatureDecoded: Buffer = base64urlDecode(signature);
-    const encPath: string = `/${processing_options}/enc/${encrypted}`;
+    const encPath: string = `/${processing_options}/enc/${encrypted}/${extension || ''}`;
     if (!verifySignature(encPath, signatureDecoded)) {
         handleResponse(res, 403, 'Invalid signature');
         return;
@@ -59,7 +60,7 @@ app.get('/:signature/:processing_options/enc/:encrypted.:extension?', async (req
         sourceFormat = format;
         // If extension is provided, use it as the format
         if (extension) {
-            format = getFormatFromExtension(extension);
+            format = parseFormatFromExtension(extension);
         }
         // If autoDetectWebp is enabled and the client accepts webp, use webp
         if (config.autoDetectWebp && req.headers.accept && req.headers.accept.includes('image/webp')) {
