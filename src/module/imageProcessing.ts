@@ -1,8 +1,8 @@
-import { ProcessedImage } from './interface/interfaces';
-import { ImageFormat, ImageOption, SavePath, SaveOptions } from './type/types';
+import { ProcessedImage } from '../interface/interfaces';
+import { ImageFormat, ImageOption, SavePath, SaveOptions } from '../type/types';
 import { Response } from 'express';
 import { handleResponse } from './utils';
-import { config } from './config';
+import { config } from '../config';
 import sharp from 'sharp';
 import { promises as fsPromises } from 'fs';
 import { join, dirname, parse, extname } from 'path';

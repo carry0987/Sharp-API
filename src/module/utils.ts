@@ -1,5 +1,5 @@
-import { ImageOption } from './type/types';
-import { config } from './config';
+import { ImageOption } from '../type/types';
+import { config } from '../config';
 import { Response } from 'express';
 import { promises as fsPromises } from 'fs';
 import * as crypto from 'crypto';

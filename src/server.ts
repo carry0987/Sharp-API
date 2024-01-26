@@ -1,8 +1,8 @@
 import { ImageFormat, SavePath } from './type/types';
 import { config } from './config';
-import { readFileAsync, checkFileExists, generateETag, handleResponse, base64urlDecode, verifySignature, decryptSourceURL } from './utils';
-import { getFormatFromExtension, parseImageFormat, parseProcessingOptions, processImage, getImageSavePath, saveProcessedImage, sendBlankImage } from './imageProcessing';
-import { gracefulShutdown } from './shutdown';
+import { readFileAsync, checkFileExists, generateETag, handleResponse, base64urlDecode, verifySignature, decryptSourceURL } from './module/utils';
+import { getFormatFromExtension, parseImageFormat, parseProcessingOptions, processImage, getImageSavePath, saveProcessedImage, sendBlankImage } from './module/imageProcessing';
+import { gracefulShutdown } from './module/shutdown';
 import express, { Application, Request, Response } from 'express';
 import axios from 'axios';
 import path from 'path';

@@ -23,7 +23,7 @@ const jsConfig = {
             preventAssignment: true,
             __version__: pkg.version
         }),
-        del({ hook: 'buildEnd', targets: ['dist/server.js', 'dist/interface', 'dist/type'] })
+        del({ hook: 'buildEnd', targets: ['dist/server.js', 'dist/interface', 'dist/type', 'dist/module'] })
     ],
     external: ['axios', 'express', 'sharp', 'cryptr', 'dotenv', 'file-type']
 };
