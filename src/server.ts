@@ -7,6 +7,7 @@ import express, { Application, Request, Response } from 'express';
 import axios from 'axios';
 import path from 'path';
 
+const version: string = '__version__';
 const app: Application = express();
 const port: string | number = process.env.PORT || 3000;
 const ALLOW_FROM_URL: boolean = config.allowFromUrl;
@@ -124,7 +125,7 @@ app.get('/:signature/:processing_options/enc/:encrypted.:extension?', async (req
 });
 
 const server = app.listen(port, () => {
-    handleResponse(null, 200, `Server is running on port ${port}`);
+    handleResponse(null, 200, `Sharp-API v${version} is running on port ${port}`);
 });
 
 process.on('SIGTERM', () => gracefulShutdown(server, 'SIGTERM'));
