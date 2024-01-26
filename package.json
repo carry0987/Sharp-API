@@ -1,6 +1,6 @@
 {
   "name": "sharp-api",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Sharp-API offers dynamic image processing in Node.js using the sharp library. Resize, convert, and optimize images easily via URLs. Secure and Docker-ready for seamless integration.",
   "main": "index.js",
   "scripts": {

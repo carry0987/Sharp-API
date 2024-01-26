@@ -5,7 +5,6 @@ import { handleResponse } from './utils';
 import { config } from './config';
 import sharp from 'sharp';
 import { promises as fsPromises } from 'fs';
-import { fileTypeFromBuffer } from 'file-type';
 import { join, dirname, parse, extname } from 'path';
 
 export function getFormatFromExtension(extension?: string): ImageFormat | undefined {
@@ -20,7 +19,8 @@ export async function parseImageFormat(sourcePath: string): Promise<ImageFormat 
     if (!format) {
         try {
             const buffer = await fsPromises.readFile(sourcePath);
-            const fileTypeResult = await fileTypeFromBuffer(buffer);
+            const fileType = await import('file-type');
+            const fileTypeResult = await fileType.fileTypeFromBuffer(buffer);
             format = fileTypeResult?.ext as ImageFormat;
         } catch (error) {
             console.error('Error determining image format:', error);
