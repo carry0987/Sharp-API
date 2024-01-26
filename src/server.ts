@@ -1,4 +1,4 @@
-import { ImageFormat, SavePath } from './type/types';
+import { ImageFormat, ImageCache, SavePath } from './type/types';
 import { config } from './config';
 import { readFileAsync, checkFileExists, generateETag, handleResponse, base64urlDecode, verifySignature, decryptSourceURL } from './module/utils';
 import { getFormatFromExtension, parseImageFormat, parseProcessingOptions, processImage, getImageSavePath, saveProcessedImage, sendBlankImage } from './module/imageProcessing';
@@ -30,6 +30,7 @@ app.get('/:signature/:processing_options/enc/:encrypted.:extension?', async (req
     const sourceURL: string = decryptSourceURL(encryptedDecoded);
     let imageBuffer: Buffer | undefined = undefined;
     let format: ImageFormat | undefined;
+    let sourceFormat: ImageFormat | undefined;
     let savePathInfo: SavePath;
     let filePath: string | null = null;
     let imageFromLocal: boolean = true;
@@ -55,6 +56,7 @@ app.get('/:signature/:processing_options/enc/:encrypted.:extension?', async (req
             // Try to get the format directly from the file extension
             format = await parseImageFormat(filePath);
         }
+        sourceFormat = format;
         // If extension is provided, use it as the format
         if (extension) {
             format = getFormatFromExtension(extension);
@@ -66,31 +68,31 @@ app.get('/:signature/:processing_options/enc/:encrypted.:extension?', async (req
         // Check if the image is already processed
         if (config.cache && imageFromLocal) {
             // Check if the image is already cached
-            const cachedPath = validateCache(sourceURL, { width, height, suffix });
+            const validCache = validateCache(sourceURL, { format, width, height, suffix });
             // Get the save path for the processed image
             savePathInfo = await getImageSavePath({
                 sourcePath: sourceURL,
                 format: format!,
-                originalFormat: format!,
+                originalFormat: sourceFormat!,
                 suffix: suffix
             });
             const imageExists = await checkFileExists(savePathInfo.path);
             // If the image is already processed, send it directly
-            if (imageExists && cachedPath) {
+            if (imageExists && validCache) {
                 // Set the E-Tag header if checkETag is enabled
                 if (config.checkETag && !res.getHeader('ETag')) {
                     const cacheImage: Buffer = await readFileAsync(savePathInfo.path);
                     const eTag = generateETag(cacheImage, { width, height, suffix });
                     const clientETag = req.headers['if-none-match'];
                     if (clientETag && clientETag === eTag) {
-                        handleResponse(res, 304, `Cached image for ${sourceURL} already sent`);
+                        handleResponse(res, 304, `Cached image for ${savePathInfo.path} already sent`);
                         return;
                     }
                     res.setHeader('ETag', eTag);
                 }
                 res.type(`image/${format}`);
                 res.sendFile(path.resolve(savePathInfo.path));
-                handleResponse(null, 200, `Sent cached image for ${sourceURL}`);
+                handleResponse(null, 200, `Sent cached image for ${savePathInfo.path}`);
                 return;
             }
         }
@@ -122,7 +124,7 @@ app.get('/:signature/:processing_options/enc/:encrypted.:extension?', async (req
             });
             await saveProcessedImage(processedImage.buffer, savePathInfo);
             // Cache the processed image
-            setCache(sourceURL, { width, height, suffix });
+            setCache(sourceURL, { format, width, height, suffix });
         }
     } catch (error) {
         const errorMsg = IMAGE_DEBUG ? `Error processing the image: ${(error as Error).stack}` : 'Unknown error occurred while processing the image';
