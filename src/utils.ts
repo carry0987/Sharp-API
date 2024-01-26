@@ -1,6 +1,22 @@
 import { config } from './config';
 import { Response } from 'express';
+import { promises as fsPromises } from 'fs';
 import * as crypto from 'crypto';
+
+export const readFileAsync = fsPromises.readFile;
+
+export async function checkFileExists(filePath: string): Promise<boolean> {
+    try {
+        await fsPromises.access(filePath, fsPromises.constants.R_OK);
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
+export function generateETag(buffer: Buffer) {
+    return crypto.createHash('md5').update(buffer).digest('hex');
+}
 
 export function handleResponse(res: Response | null, statusCode: number, logMessage: string, clientMessage?: string, error?: Error) {
     if (error) {

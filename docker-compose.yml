@@ -13,6 +13,8 @@ services:
       - AUTO_DETECT_WEBP=false
       - ALLOW_FROM_URL=true
       - SAVE_IMAGE=true
+      - CACHE=true
+      - CHECK_ETAG=false
       - IMAGE_DEBUG=false
     volumes:
       - ./images:/app/images

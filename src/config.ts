@@ -29,5 +29,7 @@ export const config = {
     basePath: '/app/images',
     processedDir: '/app/processed',
     saveImage: getEnvBoolean('SAVE_IMAGE', false),
-    imageDebug: getEnvBoolean('IMAGE_DEBUG', false),
+    cache: getEnvBoolean('CACHE', false),
+    checkETag: getEnvBoolean('CHECK_ETAG', false),
+    imageDebug: getEnvBoolean('IMAGE_DEBUG', false)
 };

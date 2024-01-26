@@ -1,17 +1,32 @@
 import { ProcessedImage } from './interface/interfaces';
-import { ImageFormat, ImageOption, SaveOptions } from './type/types';
+import { ImageFormat, ImageOption, SavePath, SaveOptions } from './type/types';
 import { Response } from 'express';
 import { handleResponse } from './utils';
 import { config } from './config';
 import sharp from 'sharp';
 import { promises as fsPromises } from 'fs';
-import { join, dirname, parse } from 'path';
+import { fileTypeFromBuffer } from 'file-type';
+import { join, dirname, parse, extname } from 'path';
 
-export function parseImageFormat(extension?: string): ImageFormat | undefined {
-    if (!extension) {
-        return undefined;
+export function getFormatFromExtension(extension?: string): ImageFormat | undefined {
+    if (!extension) return undefined;
+
+    return extension.toLowerCase() as ImageFormat;
+}
+
+export async function parseImageFormat(sourcePath: string): Promise<ImageFormat | undefined> {
+    let format: ImageFormat | undefined = getFormatFromExtension(extname(sourcePath).substring(1));
+
+    if (!format) {
+        try {
+            const buffer = await fsPromises.readFile(sourcePath);
+            const fileTypeResult = await fileTypeFromBuffer(buffer);
+            format = fileTypeResult?.ext as ImageFormat;
+        } catch (error) {
+            console.error('Error determining image format:', error);
+            format = undefined;
+        }
     }
-    const format = extension.toLowerCase() as ImageFormat;
 
     return format;
 }
@@ -87,21 +102,32 @@ export async function processImage(buffer: Buffer, width?: number, height?: numb
 
     return {
         buffer: processedBuffer,
-        originalFormat: imageFormat,
-        format: format
+        format: format,
+        originalFormat: imageFormat
     };
 }
 
-export async function saveProcessedImage(options: SaveOptions): Promise<void> {
+export async function getImageSavePath(options: SaveOptions): Promise<SavePath> {
+    const { sourcePath, format, originalFormat, suffix } = options;
+    const processedDir: string = config.processedDir;
+    const relativeSourcePath: string = sourcePath.startsWith('/') ? sourcePath.substring(1) : sourcePath;
+    const parsedPath = parse(relativeSourcePath);
+    const directory: string = join(processedDir, parsedPath.dir);
+    const baseName = parsedPath.name + (suffix ? `${suffix}` : '');
+    const newExtension = format === originalFormat ? parsedPath.ext : `.${format}`;
+    const savePath: string = join(directory, `${baseName}${newExtension}`);
+
+    return {
+        dir: dirname(savePath),
+        path: savePath
+    };
+}
+
+export async function saveProcessedImage(processedBuffer: Buffer, options: SavePath): Promise<void> {
     if (config.saveImage) {
-        const { sourcePath, processedBuffer, format, originalFormat, suffix } = options;
-        const processedDir: string = config.processedDir;
-        const relativeSourcePath: string = sourcePath.startsWith('/') ? sourcePath.substring(1) : sourcePath;
-        const parsedPath = parse(relativeSourcePath);
-        const directory: string = join(processedDir, parsedPath.dir);
-        const baseName = parsedPath.name + (suffix ? `${suffix}` : '');
-        const newExtension = format === originalFormat ? parsedPath.ext : `.${format}`;
-        const savePath: string = join(directory, `${baseName}${newExtension}`);
+        const { dir, path } = options;
+        const directory: string = dir;
+        const savePath: string = path;
         try {
             await fsPromises.mkdir(directory, { recursive: true });
             await fsPromises.writeFile(savePath, processedBuffer);
