@@ -46,11 +46,25 @@ export function base64urlDecode(str: string): Buffer {
 }
 
 export function decryptSourceURL(encrypted: Buffer): string {
-    const iv: Buffer = encrypted.subarray(0, 16);
-    const encryptedText: Buffer = encrypted.subarray(16);
-    const decipher = crypto.createDecipheriv('aes-256-cbc', config.sourceUrlEncryptionKey, iv);
-    let decrypted = decipher.update(encryptedText);
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    const ivLength = 12; // Initialization vector is typically 12 bytes for aes-256-gcm
+    const tagLength = 16; // Tag is typically 16 bytes for aes-256-gcm
+    // aes-256-gcm requires a 16-byte IV and a separate authentication tag
+    const iv: Buffer = encrypted.subarray(0, ivLength);
+    const tag: Buffer = encrypted.subarray(encrypted.length - tagLength);
+    const encryptedText: Buffer = encrypted.subarray(ivLength, encrypted.length - tagLength); // Consider tag is last 16 bytes
+    // Use aes-256-gcm for decryption.
+    const decipher = crypto.createDecipheriv('aes-256-gcm', config.sourceUrlEncryptionKey, iv);
+    // Set the authentication tag from the encrypted data.
+    decipher.setAuthTag(tag);
+    // Update decipher with encrypted data and return concatenated decrypted data.
+    let decrypted: Buffer = decipher.update(encryptedText);
+    try {
+        // Finalize the decryption process.
+        decrypted = Buffer.concat([decrypted, decipher.final()]);
+    } catch (error) {
+        // If the tag doesn't match, an error is thrown.
+        handleResponse(null, 401, 'Authentication failed. The encrypted message or the key may be tampered with.', undefined, error as Error);
+    }
 
     return decrypted.toString();
 }
