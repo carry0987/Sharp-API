@@ -8,20 +8,24 @@ import { promises as fsPromises } from 'fs';
 import { join, dirname, parse } from 'path';
 
 export async function processImage(buffer: Buffer, width?: number, height?: number, format?: ImageFormat): Promise<ProcessedImage> {
-    const checkAnimated = ['gif', 'webp'].includes(format || '');
     let image = sharp(buffer);
     let metadata = await image.metadata();
-    if (checkAnimated && metadata.pages && metadata.pages > 1) {
-        image = sharp(buffer, { animated: true });
-        metadata = await image.metadata();
-    }
 
+    // Check if image is supported
     const imageFormat = metadata.format as ImageFormat;
     if (!format) {
         format = imageFormat;
     }
 
+    // Check if image is animated
+    const checkAnimated = ['gif', 'webp'].includes(format);
+    if (checkAnimated && metadata.pages && metadata.pages > 1) {
+        image = sharp(buffer, { animated: true });
+        metadata = await image.metadata();
+    }
+
     if (metadata.width && metadata.height) {
+        if (metadata.pageHeight) metadata.height = metadata.pageHeight;
         if (width && height === undefined) {
             height = Math.round(metadata.height * (width / metadata.width));
         } else if (height && width === undefined) {
@@ -82,12 +86,10 @@ export async function getImageSavePath(options: SaveOptions): Promise<SavePath> 
 export async function saveProcessedImage(processedBuffer: Buffer, options: SavePath): Promise<void> {
     if (config.saveImage) {
         const { dir, path } = options;
-        const directory: string = dir;
-        const savePath: string = path;
         try {
-            await fsPromises.mkdir(directory, { recursive: true });
-            await fsPromises.writeFile(savePath, processedBuffer);
-            handleResponse(null, 200, `Image saved to ${savePath}`);
+            await fsPromises.mkdir(dir, { recursive: true });
+            await fsPromises.writeFile(path, processedBuffer);
+            handleResponse(null, 200, `Image saved to ${path}`);
         } catch (error) {
             handleResponse(null, 500, `Error saving processed image: ${error}`);
         }
@@ -95,23 +97,20 @@ export async function saveProcessedImage(processedBuffer: Buffer, options: SaveP
 }
 
 export async function sendBlankImage(res: Response) {
-    await sharp({
-        create: {
-            width: 1,
-            height: 1,
-            channels: 4,
-            background: { r: 255, g: 255, b: 255, alpha: 0 }
-        }
-    })
-    .png()
-    .toBuffer()
-    .then(blankBuffer => {
+    try {
+        const blankBuffer = await sharp({
+            create: {
+                width: 1,
+                height: 1,
+                channels: 4,
+                background: { r: 255, g: 255, b: 255, alpha: 0 }
+            }
+        }).png().toBuffer();
         res.type('image/png');
         res.send(blankBuffer);
         handleResponse(null, 200, 'Sent blank image.');
-    })
-    .catch((error) => {
+    } catch (error: unknown) {
         const errMsg: string = 'Error generating blank image';
-        handleResponse(res, 500, errMsg, errMsg, error);
-    });
+        handleResponse(res, 500, errMsg, errMsg, error as Error);
+    }
 }
