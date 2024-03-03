@@ -8,8 +8,14 @@ import { promises as fsPromises } from 'fs';
 import { join, dirname, parse } from 'path';
 
 export async function processImage(buffer: Buffer, width?: number, height?: number, format?: ImageFormat): Promise<ProcessedImage> {
+    const checkAnimated = ['gif', 'webp'].includes(format || '');
     let image = sharp(buffer);
-    const metadata = await image.metadata();
+    let metadata = await image.metadata();
+    if (checkAnimated && metadata.pages && metadata.pages > 1) {
+        image = sharp(buffer, { animated: true });
+        metadata = await image.metadata();
+    }
+
     const imageFormat = metadata.format as ImageFormat;
     if (!format) {
         format = imageFormat;
