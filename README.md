@@ -74,7 +74,7 @@ If you want to set **suffix** for the processed image, you can specify it as fol
 ```
 
 ## Contributing
-We welcome all forms of contributions, whether it be submitting issues, writing documentation, or sending pull requests. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to get started.
+We welcome all forms of contributions, whether it be submitting issues, writing documentation, or sending pull requests.
 
 ## License
 This project is licensed under the [MIT](LICENSE) License.
