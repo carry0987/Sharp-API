@@ -3,7 +3,7 @@ Sharp-API is a high-performance Node.js image processing service that leverages 
 
 ## Features
 - **Dynamic Image Processing**: Supports on-the-fly image processing through URL parameters.
-- **Format Support**: Handles common image formats such as JPEG, PNG, WEBP, and more.
+- **Format Support**: Handles common image formats such as JPEG, PNG, WEBP, AVIF, HEIC and more.
 - **Secure Encryption**: Uses AES encryption and signature verification to secure image sources.
 - **Easy Integration**: Built with the Express framework, allowing for straightforward integration into existing Node.js applications.
 - **Optimized Performance**: Utilizes the sharp library for fast and efficient image processing and compression.
