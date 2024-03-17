@@ -1,4 +1,4 @@
-export type ImageFormat = 'webp' | 'png' | 'jpeg' | 'jpg' | 'gif' | 'bmp';
+export type ImageFormat = 'webp' | 'avif' | 'png' | 'jpeg' | 'jpg' | 'gif' | 'bmp' | 'heif' | 'heic';
 export type ImageOption = { width?: number, height?: number, suffix?: string };
 export type ImageCache = { format?: ImageFormat, width?: number, height?: number, suffix?: string };
 export type SavePath = { dir: string, path: string };

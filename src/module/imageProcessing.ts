@@ -18,7 +18,7 @@ export async function processImage(buffer: Buffer, width?: number, height?: numb
     }
 
     // Check if image is animated
-    const checkAnimated = ['gif', 'webp'].includes(format);
+    const checkAnimated = ['gif', 'webp', 'avif', 'heic', 'heif'].includes(format);
     if (checkAnimated && metadata.pages && metadata.pages > 1) {
         image = sharp(buffer, { animated: true });
         metadata = await image.metadata();
@@ -46,6 +46,9 @@ export async function processImage(buffer: Buffer, width?: number, height?: numb
         case 'webp':
             processedBuffer = await image.webp().toBuffer();
             break;
+        case 'avif':
+            processedBuffer = await image.avif().toBuffer();
+            break;
         case 'png':
             processedBuffer = await image.png().toBuffer();
             break;
@@ -55,6 +58,10 @@ export async function processImage(buffer: Buffer, width?: number, height?: numb
             break;
         case 'gif':
             processedBuffer = await image.gif().toBuffer();
+            break;
+        case 'heic':
+        case 'heif':
+            processedBuffer = await image.heif({ compression: 'hevc' }).toBuffer();
             break;
         default:
             throw new Error(`Unsupported image format: ${format}`);
