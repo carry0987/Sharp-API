@@ -1,4 +1,4 @@
-import { ImageFormat, ImageCache, SavePath } from './type/types';
+import { ImageFormat, SavePath } from './type/types';
 import { config } from './config';
 import { readFileAsync, checkFileExists, generateETag, handleResponse, base64urlDecode, verifySignature, decryptSourceURL } from './module/utils';
 import { parseFormatFromExtension, parseImageFormat, parseProcessingOptions } from './module/parser';
@@ -8,6 +8,7 @@ import { setCache, validateCache } from './module/cache';
 import express, { Application, Request, Response } from 'express';
 import axios from 'axios';
 import path from 'path';
+import sharp from 'sharp';
 
 const version: string = '__version__';
 const app: Application = express();
@@ -137,7 +138,23 @@ app.get('/:signature/:processing_options/enc/:encrypted/:extension?', async (req
 });
 
 const server = app.listen(port, () => {
-    handleResponse(null, 200, `Sharp-API v${version} is running on port ${port}`);
+    handleResponse(null, 200, `\x1b[36m`);
+    handleResponse(null, 200, `============================================`);
+    handleResponse(null, 200, `Sharp-API is running on port ${port}`);
+    handleResponse(null, 200, `============================================`);
+    handleResponse(null, 200, `API Version: ${version}`);
+    handleResponse(null, 200, `Node Version: ${process.version}`);
+    handleResponse(null, 200, `Sharp Version: ${sharp.versions.sharp}`);
+    handleResponse(null, 200, `libvips Version: ${sharp.versions.vips}`);
+    handleResponse(null, 200, `============================================`);
+    handleResponse(null, 200, `Base path: ${BASE_PATH}`);
+    handleResponse(null, 200, `Allow from URL: ${ALLOW_FROM_URL}`);
+    handleResponse(null, 200, `Image debug: ${IMAGE_DEBUG}`);
+    handleResponse(null, 200, `Auto detect webp: ${config.autoDetectWebp}`);
+    handleResponse(null, 200, `Cache: ${config.cache}`);
+    handleResponse(null, 200, `Check ETag: ${config.checkETag}`);
+    handleResponse(null, 200, `============================================`);
+    handleResponse(null, 200, `\x1b[0m`);
 });
 
 process.on('SIGTERM', () => gracefulShutdown(server, 'SIGTERM'));
