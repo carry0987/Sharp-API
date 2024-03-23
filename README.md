@@ -73,6 +73,13 @@ If you want to set **suffix** for the processed image, you can specify it as fol
 <processing_options> = rs:300:300:_s
 ```
 
+## Projects Using Sharp-API
+Several projects are built on top of or with Sharp-API to extend its capabilities and offer more features. Here's a list of such projects:
+
+- [PHP-Sharp](https://github.com/carry0987/PHP-Sharp): A PHP script for generating signed and encrypted URLs for image processing with Sharp-API, using AES-256-GCM and HMAC-SHA256.
+
+We encourage the community to build more projects leveraging Sharp-API's powerful image processing capabilities. If you have a project that uses Sharp-API, feel free to open a pull request to add it to this list!
+
 ## Contributing
 We welcome all forms of contributions, whether it be submitting issues, writing documentation, or sending pull requests.
 
