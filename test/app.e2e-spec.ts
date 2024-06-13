@@ -21,4 +21,11 @@ describe('AppController (e2e)', () => {
             .expect(200)
             .expect('Welcome to the Sharp API !');
     });
+
+    it('/guyg/rs:300:300/enc/dqwd (GET)', () => {
+        return request(app.getHttpServer())
+            .get('/guyg/rs:300:300/enc/dqwd')
+            .expect(403)
+            .expect('Invalid signature');
+    });
 });
