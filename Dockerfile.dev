@@ -15,7 +15,10 @@ RUN npm install -g pnpm && pnpm install
 COPY . .
 
 # Build the NestJS application
-RUN pnpm build && pnpm prune --prod
+RUN pnpm build
+
+# Clean up
+RUN pnpm prune --prod && pnpm store prune
 
 # Run the NestJS application
-CMD ["node", "dist/main"]
+CMD ["node", "dist/src/main"]
