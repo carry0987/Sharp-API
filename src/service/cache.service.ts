@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
-import crypto from 'crypto';
+import xxhash from 'xxhashjs';
 import { ImageCache } from '../common/type/types';
 
 @Injectable()
@@ -10,10 +10,7 @@ export class CacheService {
     private generateCacheHash(url: string, options: ImageCache): string {
         const optionsString = JSON.stringify(options);
 
-        return crypto
-            .createHash('md5')
-            .update(url + optionsString)
-            .digest('hex');
+        return xxhash.h32(url + optionsString, 0xabcd).toString(16);
     }
 
     async setCache(url: string, options: ImageCache): Promise<void> {

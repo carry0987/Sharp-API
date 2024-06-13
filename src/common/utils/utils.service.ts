@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { promises as fsPromises } from 'fs';
 import crypto from 'crypto';
+import xxhash from 'xxhashjs';
 
 @Injectable()
 export class UtilsService {
@@ -56,11 +57,9 @@ export class UtilsService {
     generateETag(buffer: Buffer, options: ImageOption): string {
         const optionsString = JSON.stringify(options);
 
-        return crypto
-            .createHash('md5')
-            .update(buffer)
-            .update(optionsString)
-            .digest('hex');
+        return xxhash
+            .h32(buffer.toString() + optionsString, 0xabcd)
+            .toString(16);
     }
 
     handleResponse(
