@@ -17,8 +17,5 @@ COPY . .
 # Build the NestJS application
 RUN pnpm run build
 
-# Expose the port the app runs on
-EXPOSE 3000
-
 # Run the NestJS application
 CMD ["node", "dist/main"]
