@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { INestApplication } from '@nestjs/common';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 import { AppModule } from './app.module';
 import { ShutdownService } from './service/shutdown.service';
 

@@ -4,7 +4,7 @@ import { ImageFormat, SavePath, SaveOptions } from '../common/type/types';
 import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { UtilsService } from '../common/utils/utils.service';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 import { promises as fsPromises } from 'fs';
 import { join, dirname, parse } from 'path';
 

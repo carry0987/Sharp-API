@@ -14,7 +14,7 @@ import axios from 'axios';
 import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { ImageFormat, SavePath } from '../common/type/types';
-import * as path from 'path';
+import path from 'path';
 
 @Controller()
 export class ImageController {

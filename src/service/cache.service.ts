@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
-import * as crypto from 'crypto';
+import crypto from 'crypto';
 import { ImageCache } from '../common/type/types';
 
 @Injectable()

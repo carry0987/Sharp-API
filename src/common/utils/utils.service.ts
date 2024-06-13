@@ -3,7 +3,7 @@ import { ImageOption } from '../type/types';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { promises as fsPromises } from 'fs';
-import * as crypto from 'crypto';
+import crypto from 'crypto';
 
 @Injectable()
 export class UtilsService {
