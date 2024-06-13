@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   sharp-api:
     image: carry0987/sharp-api:latest
