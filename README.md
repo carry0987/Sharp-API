@@ -10,13 +10,11 @@ Sharp-API is a high-performance Node.js image processing service that leverages 
 - **Container Deployment**: Includes a Dockerfile for containerized microservice deployment.
 
 ## Installation
-
 ```bash
 $ pnpm install
 ```
 
 ## Running the app
-
 ```bash
 # development
 $ pnpm run start
@@ -29,7 +27,6 @@ $ pnpm run start:prod
 ```
 
 ## Test
-
 ```bash
 # unit tests
 $ pnpm run test
