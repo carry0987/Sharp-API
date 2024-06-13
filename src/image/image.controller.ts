@@ -16,7 +16,7 @@ import { ConfigService } from '@nestjs/config';
 import { ImageFormat, SavePath } from '../common/type/types';
 import * as path from 'path';
 
-@Controller('image')
+@Controller()
 export class ImageController {
     private readonly allowFromUrl: boolean;
     private readonly basePath: string;
