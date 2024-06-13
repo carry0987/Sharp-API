@@ -5,9 +5,41 @@ Sharp-API is a high-performance Node.js image processing service that leverages 
 - **Dynamic Image Processing**: Supports on-the-fly image processing through URL parameters.
 - **Format Support**: Handles common image formats such as JPEG, PNG, WEBP, AVIF, HEIC and more.
 - **Secure Encryption**: Uses AES encryption and signature verification to secure image sources.
-- **Easy Integration**: Built with the Express framework, allowing for straightforward integration into existing Node.js applications.
+- **Easy Integration**: Built with the NestJS framework, allowing for straightforward integration and modular development.
 - **Optimized Performance**: Utilizes the sharp library for fast and efficient image processing and compression.
 - **Container Deployment**: Includes a Dockerfile for containerized microservice deployment.
+
+## Installation
+
+```bash
+$ pnpm install
+```
+
+## Running the app
+
+```bash
+# development
+$ pnpm run start
+
+# watch mode
+$ pnpm run start:dev
+
+# production mode
+$ pnpm run start:prod
+```
+
+## Test
+
+```bash
+# unit tests
+$ pnpm run test
+
+# e2e tests
+$ pnpm run test:e2e
+
+# test coverage
+$ pnpm run test:cov
+```
 
 ## Getting Started
 Follow these steps to get Sharp-API up and running on your machine or within a container:
