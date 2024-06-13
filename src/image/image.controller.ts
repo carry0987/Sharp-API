@@ -50,7 +50,7 @@ export class ImageController {
     }
 
     @Get('/:signature/:processing_options/enc/:encrypted/:extension?')
-    async processImage(
+    public async processImage(
         @Param('signature') signature: string,
         @Param('processing_options') processingOptions: string,
         @Param('encrypted') encrypted: string,
