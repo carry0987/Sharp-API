@@ -1,6 +1,6 @@
 {
   "name": "sharp-api",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "Sharp-API offers dynamic image processing in Node.js using the sharp library. Resize, convert, and optimize images easily via URLs. Secure and Docker-ready for seamless integration.",
   "author": "carry0987",
   "private": true,
@@ -20,7 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@carry0987/utils": "^3.6.4",
+    "@carry0987/utils": "^3.6.5",
     "@nestjs/axios": "^3.0.2",
     "@nestjs/cache-manager": "^2.2.2",
     "@nestjs/common": "^10.3.9",
