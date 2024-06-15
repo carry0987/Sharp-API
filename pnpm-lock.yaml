@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@carry0987/utils':
+        specifier: ^3.6.4
+        version: 3.6.4
       '@nestjs/axios':
         specifier: ^3.0.2
         version: 3.0.2(@nestjs/common@10.3.9(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.7.2)(rxjs@7.8.1)
@@ -308,6 +311,9 @@ packages:
 
   '@bcoe/v8-coverage@0.2.3':
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
+
+  '@carry0987/utils@3.6.4':
+    resolution: {integrity: sha512-JOT4ugYY6Km8GmQ/3yZ7mfSOEDM5peD09JDKb4irp3HeSxYp7X7ogZj6QmdIEwjMuzLKZJFjkXZ1xD17NWluDQ==}
 
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
@@ -3295,6 +3301,8 @@ snapshots:
       to-fast-properties: 2.0.0
 
   '@bcoe/v8-coverage@0.2.3': {}
+
+  '@carry0987/utils@3.6.4': {}
 
   '@colors/colors@1.5.0':
     optional: true

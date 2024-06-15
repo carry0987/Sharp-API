@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { isString } from '@carry0987/utils';
 import { ParserService } from './parser.service';
 import { UtilsService } from '../common/utils/utils.service';
 import { ImageFormat } from '../common/type/types';
@@ -29,23 +30,46 @@ export class ImageFetchService {
         let format: ImageFormat | undefined;
 
         if (this.allowFromUrl && sourceURL.match(/^https?:\/\//)) {
-            const response = await axios({
-                url: sourceURL,
-                responseType: 'arraybuffer',
-            });
-            imageBuffer = response.data;
-            const contentType = response.headers['content-type'];
-            format = contentType
-                ? contentType.split('/')[1]
-                : await this.parserService.parseImageFormat(sourceURL);
+            const { imageBuffer: fetchedImageBuffer, format: fetchedFormat } =
+                await this.fetchImageFromUrl(sourceURL);
+            imageBuffer = fetchedImageBuffer;
+            format = fetchedFormat;
         } else {
-            if (filePath != null) {
-                imageBuffer = await this.utilsService.readFileAsync(filePath);
-                format = await this.parserService.parseImageFormat(filePath);
-            } else {
-                throw new Error('File path is null');
-            }
+            const { imageBuffer: fetchedImageBuffer, format: fetchedFormat } =
+                await this.fetchImageFromLocal(filePath);
+            imageBuffer = fetchedImageBuffer;
+            format = fetchedFormat;
         }
+
+        return { imageBuffer, format };
+    }
+
+    private async fetchImageFromUrl(sourceURL: string) {
+        let format: ImageFormat | undefined;
+
+        const response = await axios<Buffer>({
+            url: sourceURL,
+            responseType: 'arraybuffer',
+        });
+        const imageBuffer = response.data;
+        const contentType = response.headers['Content-Type'];
+
+        if (isString(contentType)) {
+            format = contentType.split('/')[1] as ImageFormat;
+        } else {
+            format = await this.parserService.parseImageFormat(sourceURL);
+        }
+
+        return { imageBuffer, format };
+    }
+
+    private async fetchImageFromLocal(filePath: string | null) {
+        if (filePath === null) {
+            throw new Error('File path is null');
+        }
+
+        const imageBuffer = await this.utilsService.readFileAsync(filePath);
+        const format = await this.parserService.parseImageFormat(filePath);
 
         return { imageBuffer, format };
     }
