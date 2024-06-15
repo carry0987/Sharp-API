@@ -7,6 +7,7 @@ import { extname } from 'path';
 export class ParserService {
     parseFormatFromExtension(extension?: string): ImageFormat | undefined {
         if (!extension) return undefined;
+
         return extension.toLowerCase() as ImageFormat;
     }
 
