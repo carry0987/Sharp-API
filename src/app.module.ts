@@ -8,6 +8,8 @@ import { UtilsService } from './common/utils/utils.service';
 import { ParserService } from './service/parser.service';
 import { CacheService } from './service/cache.service';
 import { ImageProcessingService } from './service/image-processing.service';
+import { ImageFetchService } from './service/image-fetch.service';
+import { SignatureService } from './service/signature.service';
 import { ImageController } from './image/image.controller';
 
 @Module({
@@ -25,6 +27,8 @@ import { ImageController } from './image/image.controller';
         ParserService,
         CacheService,
         ImageProcessingService,
+        ImageFetchService,
+        SignatureService,
     ],
 })
 export class AppModule {}
