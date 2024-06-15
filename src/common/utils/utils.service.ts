@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ImageOption } from '../type/types';
 import { ConfigService } from '@nestjs/config';
+import { ImageOption } from '@/common/type/types';
 import { Response } from 'express';
 import { promises as fsPromises } from 'fs';
 import crypto from 'crypto';
