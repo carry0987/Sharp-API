@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { ImageFormat, ImageOption } from '../common/type/types';
+import { ImageFormat, ImageOption } from '@/common/type/types';
 import { promises as fsPromises } from 'fs';
 import { extname } from 'path';
 
 @Injectable()
 export class ParserService {
-    parseFormatFromExtension(extension?: string): ImageFormat | undefined {
+    public parseFormatFromExtension(
+        extension?: string,
+    ): ImageFormat | undefined {
         if (!extension) return undefined;
 
         return extension.toLowerCase() as ImageFormat;
     }
 
-    async parseImageFormat(
+    public async parseImageFormat(
         sourcePath: string,
     ): Promise<ImageFormat | undefined> {
         let format: ImageFormat | undefined = this.parseFormatFromExtension(
@@ -34,7 +36,7 @@ export class ParserService {
         return format;
     }
 
-    parseProcessingOptions(processingOptions: string): ImageOption {
+    public parseProcessingOptions(processingOptions: string): ImageOption {
         let width: number | undefined;
         let height: number | undefined;
         let suffix: string | undefined;
