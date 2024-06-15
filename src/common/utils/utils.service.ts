@@ -9,43 +9,31 @@ import xxhash from 'xxhashjs';
 @Injectable()
 export class UtilsService {
     private readonly sourceUrlEncryptionKey: Buffer;
-    private readonly imageKey: Buffer;
-    private readonly imageSalt: Buffer;
 
     constructor(private configService: ConfigService) {
         const sourceUrlEncryptionKey = this.configService.get<string>(
             'SOURCE_URL_ENCRYPTION_KEY',
         );
-        const imageKey = this.configService.get<string>('IMAGE_KEY');
-        const imageSalt = this.configService.get<string>('IMAGE_SALT');
 
         if (!sourceUrlEncryptionKey) {
             throw new Error('The source URL encryption key is not set.');
-        }
-        if (!imageKey) {
-            throw new Error('The image key is not set.');
-        }
-        if (!imageSalt) {
-            throw new Error('The image salt is not set.');
         }
 
         this.sourceUrlEncryptionKey = Buffer.from(
             sourceUrlEncryptionKey,
             'hex',
         );
-        this.imageKey = Buffer.from(imageKey, 'hex');
-        this.imageSalt = Buffer.from(imageSalt, 'hex');
     }
 
-    removeTrailingSlash(str: string): string {
+    public removeTrailingSlash(str: string): string {
         return str.replace(/\/+$/, '');
     }
 
-    async readFileAsync(filePath: string): Promise<Buffer> {
+    public async readFileAsync(filePath: string): Promise<Buffer> {
         return await fsPromises.readFile(filePath);
     }
 
-    async checkFileExists(filePath: string): Promise<boolean> {
+    public async checkFileExists(filePath: string): Promise<boolean> {
         try {
             await fsPromises.access(filePath, fsPromises.constants.R_OK);
             return true;
@@ -54,7 +42,7 @@ export class UtilsService {
         }
     }
 
-    generateETag(buffer: Buffer, options: ImageOption): string {
+    public generateETag(buffer: Buffer, options: ImageOption): string {
         const optionsString = JSON.stringify(options);
 
         return xxhash
@@ -62,7 +50,7 @@ export class UtilsService {
             .toString(16);
     }
 
-    handleResponse(
+    public handleResponse(
         res: Response | null,
         statusCode: number,
         logMessage: string,
@@ -84,11 +72,11 @@ export class UtilsService {
         }
     }
 
-    base64urlDecode(str: string): Buffer {
+    public base64urlDecode(str: string): Buffer {
         return Buffer.from(str.replace(/-/g, '+').replace(/_/g, '/'), 'base64');
     }
 
-    decryptSourceURL(encrypted: Buffer): string {
+    public decryptSourceURL(encrypted: Buffer): string {
         if (!this.sourceUrlEncryptionKey) {
             this.handleResponse(
                 null,
@@ -132,25 +120,5 @@ export class UtilsService {
         }
 
         return decrypted.toString();
-    }
-
-    verifySignature(path: string, signature: Buffer): boolean {
-        if (!this.imageKey || !this.imageSalt) {
-            this.handleResponse(
-                null,
-                500,
-                'Internal server error. The image key or salt is not set.',
-                undefined,
-            );
-            throw new Error('The image key or salt is not set.');
-        }
-        path = this.removeTrailingSlash(path);
-        const hash: Buffer = crypto
-            .createHmac('sha256', this.imageKey)
-            .update(this.imageSalt)
-            .update(path)
-            .digest();
-
-        return signature.equals(hash.subarray(0, signature.length));
     }
 }
