@@ -17,6 +17,7 @@ async function logServiceInfo(app: INestApplication, port: number) {
         false,
     );
     const CACHE = configService.get<boolean>('CACHE', false);
+    const STRICT_CACHE = configService.get<boolean>('STRICT_CACHE', false);
     const CHECK_ETAG = configService.get<boolean>('CHECK_ETAG', false);
 
     console.log(`\x1b[36m`);
@@ -33,6 +34,7 @@ async function logServiceInfo(app: INestApplication, port: number) {
     console.log(`Image debug: ${IMAGE_DEBUG}`);
     console.log(`Auto detect webp: ${AUTO_DETECT_WEBP}`);
     console.log(`Cache: ${CACHE}`);
+    console.log(`Strict Cache: ${STRICT_CACHE}`);
     console.log(`Check ETag: ${CHECK_ETAG}`);
     console.log(`============================================`);
     console.log(`\x1b[0m`);

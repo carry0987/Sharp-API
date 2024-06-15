@@ -7,6 +7,7 @@ Sharp-API is a high-performance Node.js image processing service that leverages 
 - **Secure Encryption**: Uses AES encryption and signature verification to secure image sources.
 - **Easy Integration**: Built with the NestJS framework, allowing for straightforward integration and modular development.
 - **Optimized Performance**: Utilizes the sharp library for fast and efficient image processing and compression.
+- **Cache Support**: Supports caching of processed images to reduce processing overhead.
 - **Container Deployment**: Includes a Dockerfile for containerized microservice deployment.
 
 ## Installation
