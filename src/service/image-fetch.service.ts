@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { isString } from '@carry0987/utils';
 import { ParserService } from './parser.service';
-import { UtilsService } from '../common/utils/utils.service';
-import { ImageFormat } from '../common/type/types';
+import { UtilsService } from '@/common/utils/utils.service';
+import { FetchImageResult } from '@/common/interface/interfaces';
+import { ImageFormat } from '@/common/type/types';
 import axios from 'axios';
 
 @Injectable()
@@ -25,11 +26,13 @@ export class ImageFetchService {
     public async fetchImage(
         sourceURL: string,
         filePath: string | null,
-    ): Promise<{ imageBuffer: Buffer; format: ImageFormat | undefined }> {
+    ): Promise<FetchImageResult> {
         let imageBuffer: Buffer;
         let format: ImageFormat | undefined;
+        let imageFromLocal: boolean = true;
 
         if (this.allowFromUrl && sourceURL.match(/^https?:\/\//)) {
+            imageFromLocal = false;
             const { imageBuffer: fetchedImageBuffer, format: fetchedFormat } =
                 await this.fetchImageFromUrl(sourceURL);
             imageBuffer = fetchedImageBuffer;
@@ -41,7 +44,7 @@ export class ImageFetchService {
             format = fetchedFormat;
         }
 
-        return { imageBuffer, format };
+        return { imageBuffer, format, imageFromLocal };
     }
 
     private async fetchImageFromUrl(sourceURL: string) {
