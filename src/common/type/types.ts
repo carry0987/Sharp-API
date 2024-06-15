@@ -9,16 +9,10 @@ export type ImageFormat =
     | 'heif'
     | 'heic';
 export type ImageOption = { width?: number; height?: number; suffix?: string };
-export type ImageCache = {
-    format?: ImageFormat;
-    width?: number;
-    height?: number;
-    suffix?: string;
-};
 export type SavePath = { dir: string; path: string };
 export type SaveOptions = {
     sourcePath: string;
-    format: ImageFormat;
-    originalFormat: ImageFormat;
+    format?: ImageFormat;
+    originalFormat?: ImageFormat;
     suffix?: string;
 };

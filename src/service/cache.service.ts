@@ -1,48 +1,76 @@
 import { Injectable, Inject } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { UtilsService } from '@/common/utils/utils.service';
-import { ImageFormat, ImageCache } from '@/common/type/types';
+import {
+    ImageCache,
+    ImageCacheOption,
+    CacheResult,
+} from '@/common/interface/interfaces';
 import { ImageProcessingService } from './image-processing.service';
+import { Response } from 'express';
 import xxhash from 'xxhashjs';
 
 @Injectable()
 export class CacheService {
+    private readonly cache: boolean;
+    private readonly strictCache: boolean;
+    private readonly checkETag: boolean;
+    // Response
+    private res: Response;
+    // Image Buffer
+    private imageBuffer: Buffer;
+
     constructor(
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
         private utilsService: UtilsService,
         private imageProcessingService: ImageProcessingService,
-    ) {}
-
-    private generateCacheHash(url: string, options: ImageCache): string {
-        const optionsString = JSON.stringify(options);
-
-        return xxhash.h32(url + optionsString, 0xabcd).toString(16);
+        private configService: ConfigService,
+    ) {
+        this.cache = this.configService.get<boolean>('CACHE', false);
+        this.strictCache = this.configService.get<boolean>(
+            'STRICT_CACHE',
+            false,
+        );
+        this.checkETag = this.configService.get<boolean>('CHECK_ETAG', false);
     }
 
-    public async handleCache(
-        sourceURL: string,
-        format: ImageFormat,
-        width: number | undefined,
-        height: number | undefined,
-        suffix: string | undefined,
-        checkETag: boolean,
-        clientETag: string,
-    ): Promise<{ cachedPath: string | null; eTag: string | null }> {
-        const validCache = await this.validateCache(sourceURL, {
-            format,
-            width,
-            height,
-            suffix,
-        });
+    public setResponse(res: Response): void {
+        this.res = res;
+    }
+
+    public async handleCache(options: ImageCacheOption): Promise<CacheResult> {
+        if (!this.cache) {
+            return { cachedPath: null, eTag: null };
+        }
+
+        const { fingerPrint, sourceURL, clientETag } = options;
+        const { imageBuffer, sourceFormat, format, width, height, suffix } =
+            fingerPrint;
+
+        // Set image buffer
+        this.imageBuffer = imageBuffer;
+
+        // Check if cache is valid
+        const validCache = await this.validateCache(sourceURL, fingerPrint);
+
+        // Get save path info
         const savePathInfo = await this.imageProcessingService.getImageSavePath(
-            { sourcePath: sourceURL, format, originalFormat: format, suffix },
+            {
+                sourcePath: sourceURL,
+                format,
+                originalFormat: sourceFormat,
+                suffix,
+            },
         );
+
+        // Check if image exists
         const imageExists = await this.utilsService.checkFileExists(
             savePathInfo.path,
         );
 
         if (imageExists && validCache) {
-            if (checkETag) {
+            if (this.checkETag && !this.res.getHeader('ETag')) {
                 const cacheImage: Buffer =
                     await this.utilsService.readFileAsync(savePathInfo.path);
                 const eTag = this.utilsService.generateETag(cacheImage, {
@@ -80,5 +108,19 @@ export class CacheService {
 
     public async flushCache(): Promise<void> {
         await this.cacheManager.reset();
+    }
+
+    private generateCacheHash(url: string, options: ImageCache): string {
+        const optionsString = JSON.stringify(options);
+
+        if (this.strictCache) {
+            const hash = xxhash.h32(0xabcd);
+            hash.update(this.imageBuffer);
+            hash.update(optionsString);
+
+            return hash.digest().toString(16);
+        }
+
+        return xxhash.h32(url + optionsString, 0xabcd).toString(16);
     }
 }

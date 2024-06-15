@@ -103,6 +103,11 @@ export class ImageProcessingService {
 
     async getImageSavePath(options: SaveOptions): Promise<SavePath> {
         const { sourcePath, format, originalFormat, suffix } = options;
+
+        if (!format || !originalFormat) {
+            throw new Error('Format is required');
+        }
+
         const relativeSourcePath: string = sourcePath.startsWith('/')
             ? sourcePath.substring(1)
             : sourcePath;

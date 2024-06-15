@@ -6,9 +6,11 @@ import { UtilsService } from '@/common/utils/utils.service';
 import { FetchImageResult } from '@/common/interface/interfaces';
 import { ImageFormat } from '@/common/type/types';
 import axios from 'axios';
+import path from 'path';
 
 @Injectable()
 export class ImageFetchService {
+    private readonly basePath: string;
     private readonly allowFromUrl: boolean;
 
     constructor(
@@ -16,6 +18,10 @@ export class ImageFetchService {
         private readonly utilsService: UtilsService,
         private configService: ConfigService,
     ) {
+        this.basePath = this.configService.get<string>(
+            'BASE_PATH',
+            '/app/images',
+        );
         this.allowFromUrl = this.configService.get<boolean>(
             'ALLOW_FROM_URL',
             false,
@@ -23,28 +29,25 @@ export class ImageFetchService {
     }
 
     // Method to fetch the image from URL or local file
-    public async fetchImage(
-        sourceURL: string,
-        filePath: string | null,
-    ): Promise<FetchImageResult> {
+    public async fetchImage(sourceURL: string): Promise<FetchImageResult> {
         let imageBuffer: Buffer;
         let format: ImageFormat | undefined;
-        let imageFromLocal: boolean = true;
+        let filePath: string | undefined;
 
         if (this.allowFromUrl && sourceURL.match(/^https?:\/\//)) {
-            imageFromLocal = false;
             const { imageBuffer: fetchedImageBuffer, format: fetchedFormat } =
                 await this.fetchImageFromUrl(sourceURL);
             imageBuffer = fetchedImageBuffer;
             format = fetchedFormat;
         } else {
+            filePath = path.resolve(this.basePath, sourceURL);
             const { imageBuffer: fetchedImageBuffer, format: fetchedFormat } =
                 await this.fetchImageFromLocal(filePath);
             imageBuffer = fetchedImageBuffer;
             format = fetchedFormat;
         }
 
-        return { imageBuffer, format, imageFromLocal };
+        return { imageBuffer, format, filePath };
     }
 
     private async fetchImageFromUrl(sourceURL: string) {

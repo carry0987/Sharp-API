@@ -8,6 +8,29 @@ export interface ProcessedImage {
 
 export interface FetchImageResult {
     imageBuffer: Buffer;
-    format: ImageFormat | undefined;
-    imageFromLocal: boolean;
+    format?: ImageFormat;
+    filePath?: string;
+}
+
+export interface ImageCache {
+    format?: ImageFormat;
+    width?: number;
+    height?: number;
+    suffix?: string;
+}
+
+export interface ImageFingerPrint extends ImageCache {
+    imageBuffer: Buffer;
+    sourceFormat?: ImageFormat;
+}
+
+export interface ImageCacheOption {
+    fingerPrint: ImageFingerPrint;
+    sourceURL: string;
+    clientETag: string;
+}
+
+export interface CacheResult {
+    cachedPath: string | null;
+    eTag: string | null;
 }
