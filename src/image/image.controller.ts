@@ -144,6 +144,7 @@ export class ImageController {
                     savePathInfo,
                 );
                 await this.cacheService.setCache(sourceURL, {
+                    imageBuffer,
                     format,
                     width,
                     height,

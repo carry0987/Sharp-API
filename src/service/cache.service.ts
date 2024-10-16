@@ -5,6 +5,7 @@ import { UtilsService } from '@/common/utils/utils.service';
 import {
     ImageCache,
     ImageCacheOption,
+    ImageFingerPrint,
     CacheResult,
 } from '@/common/interface/interfaces';
 import { ImageProcessingService } from './image-processing.service';
@@ -89,7 +90,7 @@ export class CacheService {
         return { cachedPath: null, eTag: null };
     }
 
-    public async setCache(url: string, options: ImageCache): Promise<void> {
+    public async setCache(url: string, options: ImageFingerPrint): Promise<void> {
         const hash = this.generateCacheHash(url, options);
         url += options.format ? `.${options.format}` : '';
         await this.cacheManager.set(url, hash);
@@ -97,7 +98,7 @@ export class CacheService {
 
     public async validateCache(
         url: string,
-        options: ImageCache,
+        options: ImageFingerPrint,
     ): Promise<boolean> {
         const hash = this.generateCacheHash(url, options);
         url += options.format ? `.${options.format}` : '';
@@ -110,8 +111,16 @@ export class CacheService {
         await this.cacheManager.reset();
     }
 
-    private generateCacheHash(url: string, options: ImageCache): string {
-        const optionsString = JSON.stringify(options);
+    private generateCacheHash(url: string, options: ImageFingerPrint): string {
+        const { imageBuffer, format, width, height, suffix } = options;
+        const cacheOption = {
+            imageBuffer,
+            format,
+            width,
+            height,
+            suffix
+        };
+        const optionsString = JSON.stringify(cacheOption);
 
         if (this.strictCache) {
             const hash = xxhash.h32(0xabcd);
