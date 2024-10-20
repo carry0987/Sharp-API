@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { UtilsService } from '@/common/utils/utils.service';
 import {
-    ImageCache,
     ImageCacheOption,
     ImageFingerPrint,
     CacheResult,
@@ -16,6 +15,7 @@ import xxhash from 'xxhashjs';
 export class CacheService {
     private readonly cache: boolean;
     private readonly strictCache: boolean;
+    private readonly cacheTTL: number;
     private readonly checkETag: boolean;
     // Response
     private res: Response;
@@ -33,6 +33,7 @@ export class CacheService {
             'STRICT_CACHE',
             false,
         );
+        this.cacheTTL = this.configService.get<number>('CACHE_TTL', 3600);
         this.checkETag = this.configService.get<boolean>('CHECK_ETAG', false);
     }
 
@@ -92,8 +93,9 @@ export class CacheService {
 
     public async setCache(url: string, options: ImageFingerPrint): Promise<void> {
         const hash = this.generateCacheHash(url, options);
+        const ttl = this.cacheTTL * 1000;
         url += options.format ? `.${options.format}` : '';
-        await this.cacheManager.set(url, hash);
+        await this.cacheManager.set(url, hash, ttl);
     }
 
     public async validateCache(
