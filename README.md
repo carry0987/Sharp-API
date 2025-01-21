@@ -1,4 +1,5 @@
 # Sharp-API
+![CI](https://github.com/carry0987/Sharp-API/actions/workflows/ci.yml/badge.svg)  
 Sharp-API is a high-performance Node.js image processing service that leverages the popular [sharp](https://github.com/lovell/sharp) library to deliver image manipulations. This service offers developers an easy way to dynamically process and save images, including resizing, format conversion, and optimization. As a RESTful API, it is easy to integrate and can operate as a microservice within Docker containers or any Node.js compatible environment.
 
 ## Features
