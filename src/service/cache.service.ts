@@ -91,7 +91,10 @@ export class CacheService {
         return { cachedPath: null, eTag: null };
     }
 
-    public async setCache(url: string, options: ImageFingerPrint): Promise<void> {
+    public async setCache(
+        url: string,
+        options: ImageFingerPrint,
+    ): Promise<void> {
         const hash = this.generateCacheHash(url, options);
         const ttl = this.cacheTTL * 1000;
         url += options.format ? `.${options.format}` : '';
@@ -110,7 +113,7 @@ export class CacheService {
     }
 
     public async flushCache(): Promise<void> {
-        await this.cacheManager.reset();
+        await this.cacheManager.clear();
     }
 
     private generateCacheHash(url: string, options: ImageFingerPrint): string {
@@ -120,7 +123,7 @@ export class CacheService {
             format,
             width,
             height,
-            suffix
+            suffix,
         };
         const optionsString = JSON.stringify(cacheOption);
 
