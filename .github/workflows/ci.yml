@@ -40,5 +40,8 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Create .env from .env.example
+        run: cp .env.example .env
+
       - name: Run Vitest tests
         run: pnpm test && pnpm test:e2e
