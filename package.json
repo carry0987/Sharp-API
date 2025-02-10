@@ -45,7 +45,7 @@
     "@types/node": "^22.13.0",
     "@types/supertest": "^6.0.2",
     "@types/xxhashjs": "^0.2.4",
-    "@typescript-eslint/eslint-plugin": "^8.22.0",
+    "@typescript-eslint/eslint-plugin": "^8.23.0",
     "@typescript-eslint/parser": "^8.22.0",
     "eslint": "^9.19.0",
     "eslint-config-prettier": "^10.0.1",
