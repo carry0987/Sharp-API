@@ -27,7 +27,7 @@
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.6",
     "@nestjs/platform-express": "^11.1.6",
-    "axios": "^1.11.0",
+    "axios": "^1.12.2",
     "cache-manager": "^7.2.0",
     "dotenv": "^17.2.2",
     "file-type": "^21.0.0",
