@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@carry0987/utils':
-        specifier: ^3.10.2
-        version: 3.10.2
+        specifier: ^3.10.3
+        version: 3.10.3
       '@nestjs/axios':
         specifier: ^4.0.1
         version: 4.0.1(@nestjs/common@11.1.12(reflect-metadata@0.2.2)(rxjs@7.8.2))(axios@1.13.2)(rxjs@7.8.2)
@@ -363,8 +363,8 @@ packages:
   '@cacheable/utils@2.3.3':
     resolution: {integrity: sha512-JsXDL70gQ+1Vc2W/KUFfkAJzgb4puKwwKehNLuB+HrNKWf91O736kGfxn4KujXCCSuh6mRRL4XEB0PkAFjWS0A==}
 
-  '@carry0987/utils@3.10.2':
-    resolution: {integrity: sha512-aLdh2W0Q5OBYRuHP8vcOyEiJJyawGD2MqWPrwhV8qjHDpZLh4Imx7Kz9HBOdkNejGxS+/hNe+hOdY950G/46bw==}
+  '@carry0987/utils@3.10.3':
+    resolution: {integrity: sha512-gB/tH9gfs1T7NeDADzOB6bz2hfsIPxKarJQJXC8op0/YvJl1cJ9yjb7ApN9j11As1uoH0tYKx+Wza+EaHXbJpw==}
 
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
@@ -3234,7 +3234,7 @@ snapshots:
       hashery: 1.4.0
       keyv: 5.6.0
 
-  '@carry0987/utils@3.10.2': {}
+  '@carry0987/utils@3.10.3': {}
 
   '@colors/colors@1.5.0':
     optional: true
