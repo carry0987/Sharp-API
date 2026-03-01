@@ -24,7 +24,7 @@
     "@nestjs/cache-manager": "^3.1.0",
     "@nestjs/common": "^11.1.12",
     "@nestjs/config": "^4.0.2",
-    "@nestjs/core": "^11.1.12",
+    "@nestjs/core": "^11.1.14",
     "@nestjs/platform-express": "^11.1.12",
     "axios": "^1.13.4",
     "cache-manager": "^7.2.8",
