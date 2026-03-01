@@ -43,7 +43,7 @@
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.2.0",
-    "@types/supertest": "^6.0.3",
+    "@types/supertest": "^7.2.0",
     "@types/xxhashjs": "^0.2.4",
     "jest": "^30.2.0",
     "source-map-support": "^0.5.21",
