@@ -20,6 +20,7 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
+    "types": ["node", "jest"],
     "paths": {
       "@/*": ["src/*"]
     }
