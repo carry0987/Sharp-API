@@ -1,6 +1,6 @@
 services:
   sharp-api:
-    image: carry0987/sharp-api:latest
+    image: ghcr.io/carry0987/sharp-api:latest
     ports:
       - 3000:3000
     environment:
