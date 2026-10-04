@@ -1,0 +1,108 @@
+name: Docker Build and Push
+
+on:
+  release:
+    types: [published]
+  workflow_call:
+    inputs:
+      tag_name:
+        required: true
+        type: string
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ghcr.io/${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux/amd64
+          - os: ubuntu-24.04-arm
+            platform: linux/arm64
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.tag_name || '' }}
+
+      - name: Extract version from tag
+        uses: carry0987/version-extractor@v1
+        id: meta
+        with:
+          tag: ${{ inputs.tag_name || github.ref_name }}
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push by digest
+        uses: carry0987/docker-digest-builder@v1
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          normalize: true
+          platform: ${{ matrix.platform }}
+          build-args: |
+            VERSION=${{ steps.meta.outputs.version-number }}
+            COMMIT=${{ github.sha }}
+          sbom: true
+
+      - name: Logout from GHCR
+        if: always()
+        run: docker logout ${{ env.REGISTRY }}
+
+  manifest:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version from tag
+        uses: carry0987/version-extractor@v1
+        id: meta
+        with:
+          tag: ${{ inputs.tag_name || github.ref_name }}
+
+      # GHCR reads annotations from the OCI image index (top-level) to display
+      # package metadata (description, license, source, etc.) on its web UI.
+      # By default, annotations are placed on individual image manifests, which
+      # GHCR ignores for the package page. Using the "index:" prefix places them
+      # at the index level so GHCR can pick them up.
+      # Note: Docker Hub does NOT have this issue — it reads metadata differently
+      # and does not require index-level annotations.
+      - name: Create and push manifest
+        uses: carry0987/docker-multi-arch-manifest@v1
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          normalize: true
+          tags: |
+            ${{ steps.meta.outputs.version-number }}
+            latest
+          annotations: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.description=Sharp-API offers dynamic image processing in NestJS using the sharp library. Resize, convert, and optimize images easily via URLs. Secure and Docker-ready for seamless integration.
+            org.opencontainers.image.licenses=MIT
+            org.opencontainers.image.version=${{ steps.meta.outputs.version-number }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+      - name: Logout from GHCR
+        if: always()
+        run: docker logout ${{ env.REGISTRY }}

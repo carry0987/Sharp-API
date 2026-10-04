@@ -1,47 +1,86 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
-    branches:
-      - master
-  workflow_dispatch:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [24]
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - name: Set up PNPM
-        uses: pnpm/action-setup@v4
+      - name: Setup pnpm
+        uses: pnpm/setup@v2
         with:
-          version: latest
-
-      - name: Set up Node.js v${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: pnpm
+          version: 12
+          cache: true
+          install: false
+          runtime: node@24
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: pnpm build
+      - name: Run Biome lint checks
+        run: pnpm lint
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [24]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/setup@v2
+        with:
+          version: 12
+          cache: true
+          install: false
+          runtime: node@${{ matrix.node }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Create .env from .env.example
         run: cp .env.example .env
 
       - name: Run Vitest tests
         run: pnpm test && pnpm test:e2e
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/setup@v2
+        with:
+          version: 12
+          cache: true
+          install: false
+          runtime: node@24
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build package
+        run: pnpm build

@@ -14,9 +14,9 @@ export class CacheService {
     private readonly cacheTTL: number;
     private readonly checkETag: boolean;
     // Response
-    private res: Response;
+    private res!: Response;
     // Image Buffer
-    private imageBuffer: Buffer;
+    private imageBuffer!: Buffer;
 
     constructor(
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
